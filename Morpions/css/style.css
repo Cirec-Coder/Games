@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+} 
+
+body {
+    font-family: 'Bangers', cursive;
+}
+
+
+.main {
+    background: linear-gradient(306deg, #ffffffad 100%, #bbbbb8f0 20%), url(../img/image.png);
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+h1 {
+    font-size: 76px;
+}
+
+.img-O,
+.player2 {
+    filter: grayscale(1) drop-shadow(10px 10px 10px black) brightness(2);
+}
+
+.img-X,
+.player1 {
+    filter: drop-shadow(10px 10px 10px black) brightness(1.5);
+}
+
+.text-shadow {
+    text-shadow: 5px 5px 4px rgba(0, 0, 0, 0.903);
+}
+
+.playable {
+    cursor: pointer;
+}
+
+.col-2 p,
+.col-2 img {
+    transition-property: all;
+    transform: scale(1);
+    transition-duration: 0.5s;
+}
+
+.playing {
+    transition-property: all;
+    background-color: rgba(24, 113, 24, 0.712);
+    transition-duration: 0.5s;
+}
+
+.playing p,
+.playing img {
+    transition-property: all;
+    transform: scale(1.4);
+    transition-duration: 0.5s;
+}
+
+div [class^="win-h"] {
+    visibility: collapse;
+    opacity: 0;
+    border-radius: 1px;
+    border-top: 1px ridge rgba(79, 195, 240, 0.727);
+    border-bottom: 1px ridge rgba(79, 195, 240, 0.727);
+    transition-property: all;
+    transition-duration: 0.2s;
+}
+
+
+div [class^="win-v"],
+div [class^="win-d"] {
+    visibility: collapse;
+    opacity: 0;
+    border-radius: 1px;
+    border-left: 1px ridge rgba(79, 195, 240, 0.727);
+    border-right: 1px ridge rgba(79, 195, 240, 0.727);
+    transition-property: all;
+    transition-duration: 0.2s;
+}
+
+div.visible {
+    visibility: visible;
+    transition-property: all;
+    opacity: 1;
+    border-radius: 12px;
+    border-width: 12px;
+    border-color: rgba(79, 240, 117, 0.727);
+    transition-property: all;
+    transition-duration: 0.9s;
+}
+
+.win-h-top {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-25%);
+}
+
+.win-h {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-55%);
+}
+
+.win-h-bottom {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-85%);
+
+}
+
+.win-v-start {
+    position: absolute;
+    height: 550px;
+    top: 80%;
+    left: 35%;
+    transform: translateX(-35%) translateY(-80%);
+}
+
+.win-v {
+    position: absolute;
+    height: 550px;
+    top: 80%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80%);
+}
+
+.win-v-end {
+    position: absolute;
+    height: 550px;
+    top: 80%;
+    left: 65%;
+    transform: translateX(-65%) translateY(-80%);
+}
+
+.win-d-1 {
+    position: absolute;
+    height: 750px;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-78%) rotateZ(45deg);
+}
+
+.win-d-2 {
+    position: absolute;
+    height: 750px;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-78%) rotateZ(-45deg);
+}
+
+#winner-msg{
+    padding: 1em 3em;
+    /* background-color: #ffffffca; */
+}
+
