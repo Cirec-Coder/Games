@@ -6,36 +6,6 @@ body {
     box-sizing: border-box;
 }
 
-#canvas1 {
-    border: 5px solid black;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #4d79bc;
-    max-width: 100%;
-    max-height: 100%;
-    font-family: 'Bangers', cursive;
-    color: rgb(220, 130, 12)
-}
-
-
-.names {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    background-color: lightgreen;
-    border-radius: 1em;
-    border: 5px solid black;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1em;
-    padding: 2em;
-}
 
 #player1,
 #player2,

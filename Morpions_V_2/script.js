@@ -1,11 +1,77 @@
+// Modifications du code pour utiliser jquery
 window.addEventListener('load', function () {
+
+
+    // grâce au jquery le css peut se faire directement ici avec beaucoup de facilité
+    $('#canvas1').css({
+        "border-radius": "2em",
+        "border": "5px solid black",
+        "position": "absolute",
+        "top": "50%",
+        "left": "50%",
+        "transform": "translate(-50%, -50%)",
+        "background": "#4d79bc",
+        "max-width": "100%",
+        "max-height": "100%",
+        "font-family": "'Bangers', cursive",
+        "color": "rgb(220, 130, 12)"
+    });
+
+    $(".container").css({
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "0.1em",
+        "padding": "2em"
+       });
+
+    $('.names').css({
+        "position": "absolute",
+        "top": "50%",
+        "left": "50%",
+        "transform": "translateX(-50%) translateY(-50%)",
+        "background-color": "lightgreen",
+        "border-radius": "1em",
+        "border": "5px solid black",
+        "font-family": "'Bangers', cursive",
+        "text-shadow": "1px 1px 0px white"
+    });
+
+    $(".title").css("text-shadow", "2px 2px 0px #777");
+    $('#btn').css({
+        "cursor": "pointer",
+        "border-color": "#3335",
+        "border-radius": "5px",
+        "font-family": "'Bangers', cursive",
+        "font-size": "20px",
+        "text-shadow": "2px 2px 0px lightgreen"
+    });
+
+    $('#nickName1, #nickName2').css("font-family", "'Bangers', cursive")
+
+
+    // et même une petite animation
+    $('#btn').hover(function () {
+        $(this).css({
+            "transition-property": "all",
+            "transition-duration": "1s",
+            "background-color": "rgb(220, 130, 12)",
+            "text-shadow": "2px 2px 0px #4d79bc"
+        });
+    }, function () {
+        $(this).css({
+            "background-color": "white",
+            "text-shadow": "2px 2px 0px lightgreen"
+        });
+    });
+
+
+
+
     //canvas setup
     const canvas = this.document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
     canvas.width = 1280;
     canvas.height = 600;
-
-    // console.log($("#btn")[0]);
 
 
 
@@ -15,49 +81,57 @@ window.addEventListener('load', function () {
     var factX = canvas.width / canvas.clientWidth;
     var factY = canvas.height / canvas.clientHeight;
 
+    // détermine aléatoirement quel joueur commence à jouer
     var currentPlayer = Math.floor(Math.random() * 2);
-    // console.log(Math.floor(Math.random() * 2));
 
-    var player1Name = "Joueur 1 ";
-    var player2Name = "Joueur 2 ";
+    // nom des joueurs
+    var player1Name = "Joueur 1";
+    var player2Name = "Joueur 2";
 
+    // cadre affichage joueur 1
     const player1Rect = { x: 0, y: 0, width: 340, height: 600 };
+    // cadre affichage joueur 2
     const player2Rect = { x: 940, y: 0, width: 340, height: 600 };
 
 
-    container = this.document.getElementsByClassName('names')[0];
-    container.addEventListener('click', e => {
+
+    // cache le formulaire "Nommer les Joueurs" 
+    $(".names").hide();
+
+    // empêche la propagation du click au reste du code
+    $('.names').click(e => {
         e.preventDefault();
         e.stopPropagation();
     })
 
-    btn = this.document.getElementById('btn');
-    btn.addEventListener('click', e => {
+
+    // récupère les données au click
+    $('#btn').click(e => {
         e.preventDefault();
         e.stopPropagation();
-        // const inputElement = document.getElementById('inputText');
-        // const inputText = inputElement.value;
-
-        var inputText = (document.getElementById('nickName1')).value;
+        var inputText = $('#nickName1').val();
         if (inputText == "")
-            player1Name = "Joueur 1 "
-        else player1Name = inputText + " ";
+            player1Name = "Joueur 1"
+        else player1Name = inputText;
 
-        inputText = (document.getElementById('nickName2')).value;
+        inputText = $('#nickName2').val();
         if (inputText == "")
-            player2Name = "Joueur 2 "
-        else player2Name = inputText + " ";
+            player2Name = "Joueur 2"
+        else player2Name = inputText;
 
 
-        // player2Name = (document.getElementById('nickName2')).value;
-        console.log(player1Name);
-        console.log(player2Name);
-        container.style = "display: none";
+        $(".names").hide("fast");
         game.paused = false;
     })
 
 
 
+    // une petite classe pour contenir les coordonées des cellules de jeu
+    // ainsi que leurs états respectif 
+    // active : si true la case est vide et donc player vaut null
+    // si active vaut false la case est occupée par un pion 
+    // et player indique si c'est le pion du joueur 1 (player vaut false)
+    // ou celui du joueur 2 (player vaut true)
     class Rect {
         constructor(x, y, width, height, active, player = null) {
             this.x = x;
@@ -68,6 +142,7 @@ window.addEventListener('load', function () {
             this.player = player;
         }
 
+        // permet de savoir si un point (x, y) se trouve dans le rectangle
         contains = function (x, y) {
             return this.x <= x && x <= this.x + this.width &&
                 this.y <= y && y <= this.y + this.height;
@@ -75,7 +150,9 @@ window.addEventListener('load', function () {
     }
 
 
-    function buildGamePadEx() {
+    // initialise un tableau de Rect qui représente la grille de jeu 
+    // dans son état de départ (début de jeu)
+    function buildGamePad() {
         pad = [];
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
@@ -88,6 +165,7 @@ window.addEventListener('load', function () {
     }
 
 
+    // classe pour gérer les click des joueurs sur les cases de jeu
     class InputHandle {
         constructor(game) {
             this.game = game;
@@ -110,20 +188,21 @@ window.addEventListener('load', function () {
                             // on retient quel joueur a placé cette pièce
                             cell.player = currentPlayer;
 
+                            // teste si il y a un gagnant ou match nul
                             if (!this.game.isWinner()) {
-                                // passe la main (joueur suivant)
+                                // si non on passe la main (joueur suivant)
                                 currentPlayer = !currentPlayer;
                             } else {
                                 this.game.gameOver = true;
-                                if (this.game.winningCode == 0)
-                                    console.log("Match nul")
-                                else {
+                                // si gagnant (pas de match nul)
+                                if (!this.game.winningCode == 0) {
+                                    // on joue le son de la victoire
                                     this.game.UI.winningSound.play();
                                     if (!currentPlayer) {
-                                        console.log("Joueur 1 Gagne en " + this.game.winningCode)
+                                        // console.log("Joueur 1 Gagne en " + this.game.winningCode)
                                         this.game.player1Score++;
                                     } else {
-                                        console.log("Joueur 2 Gagne en " + this.game.winningCode)
+                                        // console.log("Joueur 2 Gagne en " + this.game.winningCode)
                                         this.game.player2Score++;
                                     }
                                 }
@@ -131,8 +210,6 @@ window.addEventListener('load', function () {
                         }
                     }
                 }
-
-                // $("#mouselog").html("Click: " + mouseX + " / " + mouseY);
             });
 
             // écoute les déplacements de la souris
@@ -151,7 +228,6 @@ window.addEventListener('load', function () {
                             document.body.style = 'cursor: pointer;';
                         }
                     }
-                    // $("#mouselog").html("Click: " + mouseX + " / " + mouseY);
                 }
             });
 
@@ -175,6 +251,7 @@ window.addEventListener('load', function () {
 
 
 
+    // classe de base commune Pion
     class Pion {
         constructor(game, cell, scale = 1) {
             this.game = game;
@@ -188,6 +265,7 @@ window.addEventListener('load', function () {
 
     }
 
+    // PionX qui hérite de Pion
     class PionX extends Pion {
         constructor(game, cell, scale = 1) {
             super(game, cell, scale);
@@ -208,6 +286,7 @@ window.addEventListener('load', function () {
 
     }
 
+    // PionO qui hérite de Pion
     class PionO extends Pion {
         constructor(game, cell, scale = 1) {
             super(game, cell, scale);
@@ -227,6 +306,7 @@ window.addEventListener('load', function () {
         }
     }
 
+    // Représente les lauriers du vinqueur
     class Winner extends Pion {
         constructor(game, cell, scale = 1) {
             super(game, cell, scale);
@@ -250,6 +330,7 @@ window.addEventListener('load', function () {
         }
     }
 
+    // dessine la grille de jeu
     class Background {
         constructor(game) {
             this.game = game;
@@ -276,6 +357,7 @@ window.addEventListener('load', function () {
         }
     }
 
+    // indique visuellement quelle ligne est gagnante
     class WinningLine {
         constructor(game) {
             this.game = game;
@@ -291,6 +373,8 @@ window.addEventListener('load', function () {
 
         }
 
+        // crée un objet gradient qui sera identique 
+        // peut imposte si la ligne est horisontale, verticale ou diagonale
         makeGradient(x1, y1, x2, y2) {
             this.gradient = ctx.createLinearGradient(x1, y1, x2, y2);
             this.gradient.addColorStop(0, 'rgb(220, 130, 12)');
@@ -348,16 +432,20 @@ window.addEventListener('load', function () {
                 if (this.game.winningCode > 0 && this.game.winningCode < 7) {
 
                     if (this.game.winningCode > 0 && this.game.winningCode < 4)
+                        // gradient horisontale
                         this.makeGradient(this.drawRect.x, this.drawRect.y, this.drawRect.x + this.drawRect.width, this.drawRect.y);
                     else
+                        // gradient verticale
                         this.makeGradient(this.drawRect.x, this.drawRect.y, this.drawRect.x, this.drawRect.y + this.drawRect.height);
 
+                    // dessine la ligne
                     context.fillStyle = 'green';
                     context.lineWidth = 20;
                     context.strokeStyle = this.gradient;
                     context.roundRect(this.drawRect.x, this.drawRect.y, this.drawRect.width, this.drawRect.height, this.drawRect.radius);
                 }
                 else
+                    // gradient diagonale
                     if (this.game.winningCode == 7) {
                         context.lineCap = "round";
                         context.lineWidth = 20;
@@ -383,6 +471,7 @@ window.addEventListener('load', function () {
                         context.moveTo(this.x + this.x * 0.4, this.y - this.width * 0.5);
                         context.lineTo(this.x - this.x * 0.4, this.y + this.width * 0.5);
                     }
+                // dessine la ligne
                 context.stroke();
                 context.fill();
                 context.restore();
@@ -390,6 +479,7 @@ window.addEventListener('load', function () {
         }
     }
 
+    //  le bouton rejouer
     class Button {
         constructor(game, title) {
             this.game = game;
@@ -463,6 +553,7 @@ window.addEventListener('load', function () {
         }
     }
 
+    // le bouton configuration (affiche le formulaire Nommer les joueurs)
     class ConfigBtn {
         constructor(game, title) {
             this.game = game;
@@ -487,7 +578,9 @@ window.addEventListener('load', function () {
 
                 if (this.btnRect.contains(mouseX, mouseY)) {
                     setTimeout(() => {
-                        container.style = 'display: block;'
+                        $('#nickName1').val(player1Name);
+                        $('#nickName2').val(player2Name);
+                        $(".names").slideDown("fast");
                         this.game.paused = true;
 
                     }, 250);
@@ -526,13 +619,15 @@ window.addEventListener('load', function () {
                 context.shadowColor = 'black';
                 context.textAlign = 'center';
                 context.font = this.fontSize + 'px ' + this.fontFamily;
-                // score
                 context.fillText(this.title, this.x, this.y + this.fontSize * 0.5);
                 context.restore();
             }
         }
     }
 
+    // classe UI 
+    // s'occupe d'afficher le nom, le score, les dégradés en fonction du joueur qui a la main
+    // et des messages (gagné ou math nul) et le bouton rejouer
     class UI {
         constructor(game) {
             this.game = game;
@@ -582,8 +677,8 @@ window.addEventListener('load', function () {
                             this.replayBtn.visible = true;
                             this.winner.visible = true;
                             if (!currentPlayer)
-                                this.msg = `${player1Name}Gagne`
-                            else this.msg = `${player2Name}Gagne`
+                                this.msg = `${player1Name} Gagne`
+                            else this.msg = `${player2Name} Gagne`
                         }, 2000)
                     }
                 }
@@ -606,6 +701,8 @@ window.addEventListener('load', function () {
             this.gradient.addColorStop(1, 'green');
             context.fillStyle = this.gradient;
 
+            // applique un effet de zoom sur les "avatars" des joueurs
+            // afin de mieux différencier celui qui a la main
             if (!currentPlayer) {
                 this.pionPlayer1.scale = 0.75;
                 this.pionPlayer2.scale = 0.5;
@@ -617,6 +714,7 @@ window.addEventListener('load', function () {
             context.fillRect(this.currentPlayerRect.x, this.currentPlayerRect.y, this.currentPlayerRect.width, this.currentPlayerRect.height);
             context.restore();
 
+            // affiche la ligne 
             this.winningLine.draw(context);
             context.save();
 
@@ -627,7 +725,7 @@ window.addEventListener('load', function () {
             context.shadowColor = 'black';
             context.textAlign = 'center';
             context.font = this.fontSize + 'px ' + this.fontFamily;
-            // score
+            // affiche lescore
             context.fillText(`Score de ${player1Name} : ` + this.game.player1Score, player1Rect.x + player1Rect.width * 0.5, 140);
             context.fillText(`Score de ${player2Name} : ` + this.game.player2Score, player2Rect.x + player2Rect.width * 0.5, 140);
 
@@ -636,14 +734,14 @@ window.addEventListener('load', function () {
             this.pionPlayer2.draw(context);
 
 
-            // crée un dégradé pour mieu visualiser quel joueur a la main.
+            // crée un dégradé pour le message de fin de partie.
             context.filter = 'opacity(0.75)';
             this.gradient = context.createLinearGradient(this.currentPlayerRect.x, this.currentPlayerRect.y, this.currentPlayerRect.x + this.currentPlayerRect.width, this.currentPlayerRect.y + this.currentPlayerRect.height);
             this.gradient.addColorStop(0, `rgb(${this.bVal}, ${this.bVal}, 255)`);
             this.gradient.addColorStop(1, `rgb(${this.bVal}, ${this.bVal}, 255)`);
             context.fillStyle = this.gradient;
             context.font = '120px ' + this.fontFamily;
-
+            // affiche le message
             context.fillText(this.msg, canvas.width * 0.5, canvas.height * 0.5);
             context.restore();
             this.configBtn.draw(context);
@@ -654,17 +752,18 @@ window.addEventListener('load', function () {
         }
     }
 
+    // la classe principale 
+    // qui utilise toutes les autres pour
+    // faire fonctionner le jeu
     class Game {
         constructor(width, height) {
             this.background = new Background(this);
             this.UI = new UI(this);
-            this.gamePad = buildGamePadEx();
+            this.gamePad = buildGamePad();
             this.input = new InputHandle(this);
-            // this.morpions = [];
             this.pions = [];
             this.width = width;
             this.height = height;
-            this.score = 0;
             this.gameOver = false;
             this.win_h_top = [this.gamePad[0], this.gamePad[1], this.gamePad[2]];
             this.win_h = [this.gamePad[3], this.gamePad[4], this.gamePad[5]];
@@ -684,7 +783,6 @@ window.addEventListener('load', function () {
         reset() {
             this.UI.replayBtn.visible = false;
             this.UI.winner.visible = false;
-            // this.pions = [];
             this.gamePad.forEach(cell => {
                 cell.active = true;
                 cell.player = null;
@@ -693,6 +791,7 @@ window.addEventListener('load', function () {
             this.winningCode = -1;
         }
 
+        // permet de tester si on a un gagant ou la partie est nulle
         isWinner() {
             function isWinningLine(cells) {
                 return (!(cells[0].active || cells[1].active || cells[2].active)) &&
@@ -707,6 +806,7 @@ window.addEventListener('load', function () {
 
             let ret = false;
             switch (true) {
+                // teste les 8 combinaisons possibles
                 case isWinningLine(this.win_h_top):
                     this.winningCode = 1;
                     ret = true
@@ -742,11 +842,13 @@ window.addEventListener('load', function () {
                     ret = true
                     break;
 
+                // teste la match nul
                 case isNull(this.gamePad):
                     this.winningCode = 0;
                     ret = true
                     break;
 
+                // sinon la partie continue
                 default:
                     this.winningCode = -1;
                     ret = false;
@@ -787,6 +889,8 @@ window.addEventListener('load', function () {
         }
     }
 
+    // instanciation de la classe Game 
+    // qui retourne un objet game utilisable.
     var game = new Game(canvas.width, canvas.height);
 
 
@@ -801,10 +905,12 @@ window.addEventListener('load', function () {
         if (!game.paused)
             game.update(deltaTime);
         game.draw(ctx);
+        // la boucle se fait ici
         requestAnimationFrame(animate);
     }
 
-    animate(0);
+    // démarre la boucle "animate"
+    animate(lastTime);
 
 
 
