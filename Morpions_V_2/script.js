@@ -75,18 +75,18 @@ window.addEventListener('load', function () {
 
 
 
-    var canvasOffset = $("#canvas1").offset();
-    var offsetX = canvasOffset.left;
-    var offsetY = canvasOffset.top;
-    var factX = canvas.width / canvas.clientWidth;
-    var factY = canvas.height / canvas.clientHeight;
+    let canvasOffset = $("#canvas1").offset();
+    let offsetX = canvasOffset.left;
+    let offsetY = canvasOffset.top;
+    let factX = canvas.width / canvas.clientWidth;
+    let factY = canvas.height / canvas.clientHeight;
 
     // détermine aléatoirement quel joueur commence à jouer
-    var currentPlayer = Math.floor(Math.random() * 2);
+    let currentPlayer = Math.floor(Math.random() * 2);
 
     // nom des joueurs
-    var player1Name = "Joueur 1";
-    var player2Name = "Joueur 2";
+    let player1Name = "Joueur 1";
+    let player2Name = "Joueur 2";
 
     // cadre affichage joueur 1
     const player1Rect = { x: 0, y: 0, width: 340, height: 600 };
@@ -109,7 +109,7 @@ window.addEventListener('load', function () {
     $('#btn').click(e => {
         e.preventDefault();
         e.stopPropagation();
-        var inputText = $('#nickName1').val();
+        let inputText = $('#nickName1').val();
         if (inputText == "")
             player1Name = "Joueur 1"
         else player1Name = inputText;
@@ -891,7 +891,7 @@ window.addEventListener('load', function () {
 
     // instanciation de la classe Game 
     // qui retourne un objet game utilisable.
-    var game = new Game(canvas.width, canvas.height);
+    let game = new Game(canvas.width, canvas.height);
 
 
 
