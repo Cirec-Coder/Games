@@ -334,9 +334,18 @@ window.addEventListener('load', function () {
     class Background {
         constructor(game) {
             this.game = game;
+            this.image = document.getElementById('bkg-image');
+            this.x = canvas.width * 0.5;
+            this.y = canvas.height * 0.5;
+            this.imgWidth = 857;
+            this.imgHeight = 600;
         }
 
         draw(context) {
+            context.save();
+            context.filter = 'opacity(0.35)';
+            context.drawImage(this.image, this.x - this.imgWidth * 0.5, this.y - this.imgHeight * 0.5, this.imgWidth, this.imgHeight);
+            context.restore();
             context.beginPath();
             context.fillStyle = 'black';
             context.moveTo(340, 0);

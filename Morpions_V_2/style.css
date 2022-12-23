@@ -9,6 +9,8 @@ body {
 
 #player1,
 #player2,
-#winner, .names {
+#winner, 
+#bkg-image,
+.names {
     display: none;
 }
