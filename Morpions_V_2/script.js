@@ -22,7 +22,7 @@ window.addEventListener('load', function () {
         "flex-direction": "column",
         "gap": "0.1em",
         "padding": "2em"
-       });
+    });
 
     $('.names').css({
         "position": "absolute",
@@ -188,6 +188,8 @@ window.addEventListener('load', function () {
                             // on retient quel joueur a placé cette pièce
                             cell.player = currentPlayer;
 
+                            // ajouté afin d'accélérer le jeu en version mobile
+                            this.game.updateMove(cell);
                             // teste si il y a un gagnant ou match nul
                             if (!this.game.isWinner()) {
                                 // si non on passe la main (joueur suivant)
@@ -536,8 +538,9 @@ window.addEventListener('load', function () {
         }
 
         draw(context) {
-            if (this.visible && this.game.gameOver) {
+            if (this.visible && this.game.gameOver){ 
                 if (this.posY > this.y) this.posY -= 5;
+                // console.log(this.posY);
                 context.save();
                 context.beginPath();
                 context.fillStyle = 'green';
@@ -652,47 +655,43 @@ window.addEventListener('load', function () {
             this.configBtn = new ConfigBtn(this.game, '*')
             this.currentPlayerRect = (!currentPlayer) ? player1Rect : player2Rect;
             this.bVal = 0;
-            this.timer = 0;
-            this.timerLimit = 1000;
             this.direction = true;
             this.gradient = null;
             this.msg = "";
-            this.deltaTime = 0;
         }
 
         update() {
-
-            if (this.direction) {
-                if (this.bVal < 254) {
-                    this.bVal += 2;
-                } else this.direction = !this.direction;
-            }
-            else {
-                if (this.bVal > 1) {
-                    this.bVal -= 2;
-                } else this.direction = !this.direction;
-            }
-            //************************************************************************************************************** */
-            if (this.game.gameOver) {
-                if (this.game.winningCode == 0) {
-                    this.replayBtn.visible = true;
-                    this.msg = "Match nul rejouer !";
+                if (this.direction) {
+                    if (this.bVal < 254) {
+                        this.bVal += 2;
+                    } else this.direction = !this.direction;
                 }
                 else {
+                    if (this.bVal > 1) {
+                        this.bVal -= 2;
+                    } else this.direction = !this.direction;
+                }
+                //************************************************************************************************************** */
+                if (this.game.gameOver) {
+                    if (this.game.winningCode == 0) {
+                        this.replayBtn.visible = true;
+                        this.msg = "Match nul rejouer !";
+                    }
+                    else {
 
-                    this.winningLine.visible = true;
-                    if (!this.replayBtn.visible) {
-                        setTimeout(() => {
-                            this.replayBtn.visible = true;
-                            this.winner.visible = true;
-                            if (!currentPlayer)
-                                this.msg = `${player1Name} Gagne`
-                            else this.msg = `${player2Name} Gagne`
-                        }, 2000)
+                        this.winningLine.visible = true;
+                        if (!this.replayBtn.visible) {
+                            setTimeout(() => {
+                                this.replayBtn.visible = true;
+                                this.winner.visible = true;
+                                if (!currentPlayer)
+                                    this.msg = `${player1Name} Gagne`
+                                else this.msg = `${player2Name} Gagne`
+                            }, 2000)
+                        }
                     }
                 }
-            }
-            else this.msg = ""
+                else this.msg = ""
 
         }
 
@@ -792,6 +791,7 @@ window.addEventListener('load', function () {
         reset() {
             this.UI.replayBtn.visible = false;
             this.UI.winner.visible = false;
+            this.pions = [];
             this.gamePad.forEach(cell => {
                 cell.active = true;
                 cell.player = null;
@@ -867,6 +867,15 @@ window.addEventListener('load', function () {
 
         }
 
+        updateMove(cell) {
+            if (cell && cell.player != null) {
+                if (!cell.player) {
+                    this.pions.push(new PionX(this, cell));
+                } else
+                    this.pions.push(new PionO(this, cell));
+            }
+        }
+
         update(deltaTime) {
 
             if (this.gameOver)
@@ -875,16 +884,6 @@ window.addEventListener('load', function () {
                 });
 
             this.UI.update(deltaTime);
-            this.pions = [];
-
-            this.gamePad.forEach(cell => {
-                if (cell.player != null) {
-                    if (!cell.player) {
-                        this.pions.push(new PionX(this, cell));
-                    } else
-                        this.pions.push(new PionO(this, cell));
-                }
-            });
 
         }
 
@@ -924,11 +923,3 @@ window.addEventListener('load', function () {
 
 
 })
-
-
-    // function showInputText() {
-    //     const inputElement = document.getElementById('inputText');
-    //     const inputText = inputElement.value;
-    //     alert(inputText);
-    //     inputElement.style="display: none;";
-    //   }
