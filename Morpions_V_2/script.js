@@ -1,4 +1,6 @@
 // Modifications du code pour utiliser jquery
+// Modification pour adapter la vitesse des animations en fonctions des capacités du support 
+//
 window.addEventListener('load', function () {
 
 
@@ -537,10 +539,11 @@ window.addEventListener('load', function () {
             })
         }
 
+
+
         draw(context) {
             if (this.visible && this.game.gameOver){ 
-                if (this.posY > this.y) this.posY -= 5;
-                // console.log(this.posY);
+                if (this.posY > this.y) this.posY -= Math.max(Math.round(this.game.dTime / 4), 1);
                 context.save();
                 context.beginPath();
                 context.fillStyle = 'green';
@@ -663,12 +666,12 @@ window.addEventListener('load', function () {
         update() {
                 if (this.direction) {
                     if (this.bVal < 254) {
-                        this.bVal += 2;
+                        this.bVal += Math.max(Math.round(this.game.dTime / 10), 1); 
                     } else this.direction = !this.direction;
                 }
                 else {
                     if (this.bVal > 1) {
-                        this.bVal -= 2;
+                        this.bVal -= Math.max(Math.round(this.game.dTime / 10), 1);
                     } else this.direction = !this.direction;
                 }
                 //************************************************************************************************************** */
@@ -785,6 +788,7 @@ window.addEventListener('load', function () {
             this.paused = false;
             this.player1Score = 0;
             this.player2Score = 0;
+            this.dTime = 0;
 
         }
 
@@ -884,6 +888,8 @@ window.addEventListener('load', function () {
                 });
 
             this.UI.update(deltaTime);
+
+            this.dTime = deltaTime;
 
         }
 
