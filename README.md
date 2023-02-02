@@ -24,6 +24,7 @@
    - utilisation d'objets
    - possibilité pour les joueurs de rentrer un nom
    - animation avec requestAnimationFrame
+   - avec une petite musique en cas de victoire !
    
    
    
